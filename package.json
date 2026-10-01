@@ -1,0 +1,1 @@
+{"private":true,"scripts":{"build":"echo Frontend uses Bootstrap/jQuery via CDN; no build step required","dev":"echo Frontend uses Bootstrap/jQuery via CDN; no build step required"}}
