@@ -17,6 +17,8 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          timeout: 60s
+          command_timeout: 10m
           script_stop: true
           script: |
             cd /home1/danie981/signos.promueve.site
