@@ -71,42 +71,61 @@
 
 
             {{-- =========================================================
-     TRATAMIENTO PARA DIABETES MELLITUS
+     TRATAMIENTOS
      ========================================================= --}}
 
-            <div class="col-md-3 mt-3">
-                <strong>Tratamiento para Diabetes Mellitus:</strong><br>
+            <div class="col-12 mt-3">
+                <strong class="d-block mb-2">Tratamientos para enfermedades crónicas:</strong>
 
-                @if ($patient->diabetes_treatment)
-                    <span class="text-success fw-bold">Sí</span>
-                @else
-                    <span class="text-secondary fw-bold">No</span>
-                @endif
-            </div>
+                <div class="row g-3">
+                    {{-- DIABETES --}}
+                    <div class="col-12 col-md-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <strong>Diabetes Mellitus</strong>
 
-            <div class="col-md-3 mt-3">
-                <strong>Fecha de inicio de tratamiento DM:</strong><br>
-                {{ $patient->diabetes_treatment_start_date?->format('d/m/Y') ?? '—' }}
-            </div>
+                                @if ($patient->diabetes_treatment)
+                                    <span class="badge bg-success">En tratamiento</span>
+                                @else
+                                    <span class="badge bg-secondary">Sin tratamiento</span>
+                                @endif
+                            </div>
 
+                            <div>
+                                <strong>Fecha de inicio:</strong>
+                                @if ($patient->diabetes_treatment)
+                                    {{ $patient->diabetes_treatment_start_date?->format('d/m/Y') ?? 'Sin fecha registrada' }}
+                                @else
+                                    No aplica
+                                @endif
+                            </div>
+                        </div>
+                    </div>
 
-            {{-- =========================================================
-     TRATAMIENTO PARA HIPERTENSIÓN ARTERIAL
-     ========================================================= --}}
+                    {{-- HIPERTENSIÓN --}}
+                    <div class="col-12 col-md-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <strong>Hipertensión Arterial</strong>
 
-            <div class="col-md-3 mt-3">
-                <strong>Tratamiento para Hipertensión Arterial:</strong><br>
+                                @if ($patient->hypertension_treatment)
+                                    <span class="badge bg-success">En tratamiento</span>
+                                @else
+                                    <span class="badge bg-secondary">Sin tratamiento</span>
+                                @endif
+                            </div>
 
-                @if ($patient->hypertension_treatment)
-                    <span class="text-success fw-bold">Sí</span>
-                @else
-                    <span class="text-secondary fw-bold">No</span>
-                @endif
-            </div>
-
-            <div class="col-md-3 mt-3">
-                <strong>Fecha de inicio de tratamiento HAS:</strong><br>
-                {{ $patient->hypertension_treatment_start_date?->format('d/m/Y') ?? '—' }}
+                            <div>
+                                <strong>Fecha de inicio:</strong>
+                                @if ($patient->hypertension_treatment)
+                                    {{ $patient->hypertension_treatment_start_date?->format('d/m/Y') ?? 'Sin fecha registrada' }}
+                                @else
+                                    No aplica
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
 
