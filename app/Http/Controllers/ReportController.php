@@ -48,7 +48,9 @@ class ReportController extends Controller
     {
         [$from, $to] = $this->dates($request);
 
-        $followUps = FollowUp::with('patient')
+        $followUps = FollowUp::with([
+            'patient.comorbidities'
+        ])
             ->when($from, fn($q) => $q->whereDate('date', '>=', $from))
             ->when($to, fn($q) => $q->whereDate('date', '<=', $to))
             ->orderBy('date', 'desc')
@@ -64,17 +66,43 @@ class ReportController extends Controller
             fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             fputcsv($out, [
-                'Fecha',
+                'Fecha de atención',
                 'Hora',
-                'Nombre',
+                'Nombre del paciente',
+                'Fecha de nacimiento',
+                'Edad',
+                'Sexo',
+                'Colonia',
+                'Comorbilidades',
+                'Tratamiento para Diabetes Mellitus',
+                'Fecha de inicio tratamiento DM',
+                'Tratamiento para Hipertensión Arterial',
+                'Fecha de inicio tratamiento HAS',
             ]);
 
             foreach ($followUps as $followUp) {
 
+                $patient = $followUp->patient;
+
+                $comorbidities = $patient->comorbidities
+                    ->pluck('name')
+                    ->implode(', ');
+
                 fputcsv($out, [
                     $followUp->date->format('d/m/Y'),
                     $followUp->date->format('H:i'),
-                    $followUp->patient->name,
+                    $patient->name,
+                    $patient->date_of_birth?->format('d/m/Y') ?? '',
+                    $patient->date_of_birth
+                        ? $patient->date_of_birth->age
+                        : '',
+                    $patient->gender ?: '',
+                    $patient->colonia ?: '',
+                    $comorbidities ?: 'Ninguna registrada',
+                    $patient->diabetes_treatment ? 'Sí' : 'No',
+                    $patient->diabetes_treatment_start_date?->format('d/m/Y') ?? '',
+                    $patient->hypertension_treatment ? 'Sí' : 'No',
+                    $patient->hypertension_treatment_start_date?->format('d/m/Y') ?? '',
                 ]);
             }
 
@@ -108,13 +136,18 @@ class ReportController extends Controller
         $sheet->setTitle('Atenciones');
 
         $headers = [
-            'Fecha',
+            'Fecha de atención',
             'Hora',
-            'Nombre',
+            'Nombre del paciente',
             'Fecha de nacimiento',
             'Edad',
+            'Sexo',
             'Colonia',
             'Comorbilidades',
+            'Tratamiento para Diabetes Mellitus',
+            'Fecha de inicio tratamiento DM',
+            'Tratamiento para Hipertensión Arterial',
+            'Fecha de inicio tratamiento HAS',
             'Presión arterial',
             'Frecuencia respiratoria',
             'Pulso',
@@ -147,12 +180,23 @@ class ReportController extends Controller
                 $followUp->date->format('d/m/Y'),
                 $followUp->date->format('H:i'),
                 $patient->name,
-                $patient->date_of_birth?->format('d/m/Y'),
+                $patient->date_of_birth?->format('d/m/Y') ?? '',
                 $patient->date_of_birth
                     ? $patient->date_of_birth->age
                     : '',
-                $patient->colonia,
-                $comorbidities,
+                $patient->gender ?: '',
+                $patient->colonia ?: '',
+                $comorbidities ?: 'Ninguna registrada',
+
+                // Tratamiento para Diabetes Mellitus
+                $patient->diabetes_treatment ? 'Sí' : 'No',
+                $patient->diabetes_treatment_start_date?->format('d/m/Y') ?? '',
+
+                // Tratamiento para Hipertensión Arterial
+                $patient->hypertension_treatment ? 'Sí' : 'No',
+                $patient->hypertension_treatment_start_date?->format('d/m/Y') ?? '',
+
+                // Datos del seguimiento
                 $followUp->blood_pressure,
                 $followUp->respiratory_rate,
                 $followUp->pulse,
@@ -161,7 +205,6 @@ class ReportController extends Controller
                 $followUp->without_fasting ? 'Sí' : 'No',
                 $followUp->capillary_glucose,
             ];
-
             foreach ($values as $index => $value) {
 
                 $column = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($index + 1);

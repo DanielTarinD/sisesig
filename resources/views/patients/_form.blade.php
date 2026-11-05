@@ -158,6 +158,40 @@
 
 
 
+        {{-- SEXO --}}
+        <div class="col-12 col-sm-6">
+
+            <label class="form-label capture-label" for="gender">
+                Sexo
+                <span class="text-danger">*</span>
+            </label>
+
+            <select name="gender" id="gender" class="form-select capture-input" required>
+
+                <option value="">Seleccione...</option>
+
+                <option value="Masculino" @selected(old('gender', $patient->gender ?? '') === 'Masculino')>
+                    Masculino
+                </option>
+
+                <option value="Femenino" @selected(old('gender', $patient->gender ?? '') === 'Femenino')>
+                    Femenino
+                </option>
+
+                <option value="Otro" @selected(old('gender', $patient->gender ?? '') === 'Otro')>
+                    Otro
+                </option>
+
+            </select>
+
+            @error('gender')
+                <div class="invalid-feedback d-block">
+                    {{ $message }}
+                </div>
+            @enderror
+
+        </div>
+
 
 
         {{-- =====================================================
@@ -242,6 +276,150 @@
 
 
 
+
+{{-- =========================================================
+TRATAMIENTO DE DIABETES E HIPERTENSIÓN
+========================================================= --}}
+
+<div class="capture-section">
+
+    <div class="capture-section-title">
+
+        <div class="capture-icon">
+            <i class="bi bi-capsule"></i>
+        </div>
+
+        <div>
+            <h5 class="mb-0">Tratamiento</h5>
+            <small class="text-muted">
+                Registro de tratamientos para enfermedades crónicas
+            </small>
+        </div>
+
+    </div>
+
+    <div class="capture-section-body">
+
+        <div class="row g-3">
+
+            {{-- DIABETES MELLITUS --}}
+            <div class="col-12 col-md-6">
+
+                <div class="border rounded-3 p-3 h-100">
+
+                    <div class="fw-semibold mb-3">
+                        <i class="bi bi-capsule me-1"></i>
+                        Diabetes Mellitus
+                    </div>
+
+                    <label for="diabetes_treatment" class="form-label capture-label">
+                        ¿Recibe tratamiento?
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <select name="diabetes_treatment" id="diabetes_treatment" class="form-select capture-input"
+                        required>
+
+                        <option value="0" @selected((string) old('diabetes_treatment', $patient->diabetes_treatment ?? 0) === '0')>
+                            No
+                        </option>
+
+                        <option value="1" @selected((string) old('diabetes_treatment', $patient->diabetes_treatment ?? 0) === '1')>
+                            Sí
+                        </option>
+
+                    </select>
+
+                    @error('diabetes_treatment')
+                        <div class="invalid-feedback d-block">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                    <div id="diabetes-date-wrapper" class="mt-3">
+
+                        <label for="diabetes_treatment_start_date" class="form-label capture-label">
+                            Fecha de inicio del tratamiento
+                        </label>
+
+                        <input type="date" name="diabetes_treatment_start_date" id="diabetes_treatment_start_date"
+                            class="form-control capture-input"
+                            value="{{ old('diabetes_treatment_start_date', isset($patient) && $patient->diabetes_treatment_start_date ? $patient->diabetes_treatment_start_date->format('Y-m-d') : '') }}">
+
+                        @error('diabetes_treatment_start_date')
+                            <div class="invalid-feedback d-block">
+                                {{ $message }}
+                            </div>
+                        @enderror
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- HIPERTENSIÓN ARTERIAL --}}
+            <div class="col-12 col-md-6">
+
+                <div class="border rounded-3 p-3 h-100">
+
+                    <div class="fw-semibold mb-3">
+                        <i class="bi bi-heart-pulse me-1"></i>
+                        Hipertensión Arterial
+                    </div>
+
+                    <label for="hypertension_treatment" class="form-label capture-label">
+                        ¿Recibe tratamiento?
+                        <span class="text-danger">*</span>
+                    </label>
+
+                    <select name="hypertension_treatment" id="hypertension_treatment"
+                        class="form-select capture-input" required>
+
+                        <option value="0" @selected((string) old('hypertension_treatment', $patient->hypertension_treatment ?? 0) === '0')>
+                            No
+                        </option>
+
+                        <option value="1" @selected((string) old('hypertension_treatment', $patient->hypertension_treatment ?? 0) === '1')>
+                            Sí
+                        </option>
+
+                    </select>
+
+                    @error('hypertension_treatment')
+                        <div class="invalid-feedback d-block">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
+                    <div id="hypertension-date-wrapper" class="mt-3">
+
+                        <label for="hypertension_treatment_start_date" class="form-label capture-label">
+                            Fecha de inicio del tratamiento
+                        </label>
+
+                        <input type="date" name="hypertension_treatment_start_date"
+                            id="hypertension_treatment_start_date" class="form-control capture-input"
+                            value="{{ old('hypertension_treatment_start_date', isset($patient) && $patient->hypertension_treatment_start_date ? $patient->hypertension_treatment_start_date->format('Y-m-d') : '') }}">
+
+                        @error('hypertension_treatment_start_date')
+                            <div class="invalid-feedback d-block">
+                                {{ $message }}
+                            </div>
+                        @enderror
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 
 {{-- =========================================================
@@ -449,8 +627,9 @@ COMORBILIDADES
 
 
 
-                <input class="form-check-input" type="checkbox" name="comorbidities[]" value="{{ $comorbidity->id }}"
-                    id="comorbidity-{{ $comorbidity->id }}" @checked($isSelected)>
+                <input class="form-check-input" type="checkbox" name="comorbidities[]"
+                    value="{{ $comorbidity->id }}" id="comorbidity-{{ $comorbidity->id }}"
+                    @checked($isSelected)>
 
 
 
@@ -724,8 +903,58 @@ SCRIPT
 
             syncFirstVisit();
 
+            /* ==========================================================
+               FECHAS DE INICIO DE TRATAMIENTO
+               ========================================================== */
 
+            const syncTreatmentDate = function(
+                treatmentSelector,
+                dateSelector,
+                wrapperSelector
+            ) {
+                const receivesTreatment = $(treatmentSelector).val() === '1';
+                const input = $(dateSelector);
+                const wrapper = $(wrapperSelector);
 
+                input.prop('disabled', !receivesTreatment);
+                input.prop('required', receivesTreatment);
+
+                wrapper.toggleClass('d-none', !receivesTreatment);
+
+                if (!receivesTreatment) {
+                    input.val('');
+                }
+            };
+
+            const syncDiabetesTreatmentDate = function() {
+                syncTreatmentDate(
+                    '#diabetes_treatment',
+                    '#diabetes_treatment_start_date',
+                    '#diabetes-date-wrapper'
+                );
+            };
+
+            const syncHypertensionTreatmentDate = function() {
+                syncTreatmentDate(
+                    '#hypertension_treatment',
+                    '#hypertension_treatment_start_date',
+                    '#hypertension-date-wrapper'
+                );
+            };
+
+            $('#diabetes_treatment').on(
+                'change',
+                syncDiabetesTreatmentDate
+            );
+
+            $('#hypertension_treatment').on(
+                'change',
+                syncHypertensionTreatmentDate
+            );
+
+            // Ejecutar al cargar el formulario
+            syncDiabetesTreatmentDate();
+            syncHypertensionTreatmentDate();
 
 
             /*
@@ -2353,9 +2582,9 @@ SCRIPT
 
         /* =========================================================
 
-                                           DROPDOWN
+                                                               DROPDOWN
 
-                                           ========================================================= */
+                                                               ========================================================= */
 
 
 
@@ -2469,9 +2698,9 @@ SCRIPT
 
         /* =========================================================
 
-                                           RESULTADOS
+                                                               RESULTADOS
 
-                                           ========================================================= */
+                                                               ========================================================= */
 
 
 
@@ -2563,9 +2792,9 @@ SCRIPT
 
         /* =========================================================
 
-                                           AGREGAR COLONIA
+                                                               AGREGAR COLONIA
 
-                                           ========================================================= */
+                                                               ========================================================= */
 
 
 
@@ -2633,9 +2862,9 @@ SCRIPT
 
         /* =========================================================
 
-                                           MENSAJES
+                                                               MENSAJES
 
-                                           ========================================================= */
+                                                               ========================================================= */
 
 
 
@@ -2659,9 +2888,9 @@ SCRIPT
 
         /* =========================================================
 
-                                           MOBILE
+                                                               MOBILE
 
-                                           ========================================================= */
+                                                               ========================================================= */
 
 
 

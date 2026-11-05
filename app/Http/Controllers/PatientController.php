@@ -493,27 +493,13 @@ class PatientController extends Controller
             'id'
         )->where(function ($query) use ($patient) {
 
-            /*
-        |--------------------------------------------------------------------------
-        | Siempre permitir comorbilidades activas
-        |--------------------------------------------------------------------------
-        */
-
+            // Permitir comorbilidades activas
             $query->where('active', true);
 
-
-            /*
-        |--------------------------------------------------------------------------
-        | En edición:
-        | permitir también una comorbilidad inactiva si ya pertenece
-        | actualmente al paciente.
-        |--------------------------------------------------------------------------
-        */
-
+            // En edición, permitir también las inactivas
+            // que actualmente pertenecen al paciente.
             if ($patient) {
-
                 $query->orWhere(function ($query) use ($patient) {
-
                     $query
                         ->where('active', false)
                         ->whereIn(
@@ -525,10 +511,8 @@ class PatientController extends Controller
             }
         });
 
-
-        return $request->validate(
+        $data = $request->validate(
             [
-
                 'name' => [
                     'required',
                     'string',
@@ -539,6 +523,38 @@ class PatientController extends Controller
                     'required',
                     'date',
                     'before_or_equal:today',
+                ],
+
+                'gender' => [
+                    'required',
+                    'string',
+                    Rule::in(['Masculino', 'Femenino', 'Otro']),
+                ],
+
+                'diabetes_treatment' => [
+                    'required',
+                    'boolean',
+                ],
+
+                'diabetes_treatment_start_date' => [
+                    'nullable',
+                    'required_if:diabetes_treatment,1',
+                    'date',
+                    'before_or_equal:today',
+                    'after_or_equal:date_of_birth',
+                ],
+
+                'hypertension_treatment' => [
+                    'required',
+                    'boolean',
+                ],
+
+                'hypertension_treatment_start_date' => [
+                    'nullable',
+                    'required_if:hypertension_treatment,1',
+                    'date',
+                    'before_or_equal:today',
+                    'after_or_equal:date_of_birth',
                 ],
 
                 'first_visit' => [
@@ -568,10 +584,8 @@ class PatientController extends Controller
                     'integer',
                     $comorbidityRule,
                 ],
-
             ],
             [
-
                 'name.required' =>
                 'El nombre del paciente es obligatorio.',
 
@@ -581,13 +595,59 @@ class PatientController extends Controller
                 'date_of_birth.before_or_equal' =>
                 'La fecha de nacimiento no puede ser posterior a hoy.',
 
+                'gender.required' =>
+                'El sexo del paciente es obligatorio.',
+
+                'gender.in' =>
+                'Seleccione una opción válida para el sexo.',
+
+                'diabetes_treatment.required' =>
+                'Indique si el paciente recibe tratamiento para Diabetes Mellitus.',
+
+                'diabetes_treatment.boolean' =>
+                'La respuesta sobre tratamiento para Diabetes Mellitus no es válida.',
+
+                'diabetes_treatment_start_date.required_if' =>
+                'Indique la fecha de inicio del tratamiento para Diabetes Mellitus.',
+
+                'diabetes_treatment_start_date.before_or_equal' =>
+                'La fecha de inicio del tratamiento para Diabetes Mellitus no puede ser posterior a hoy.',
+
+                'diabetes_treatment_start_date.after_or_equal' =>
+                'La fecha de inicio del tratamiento para Diabetes Mellitus no puede ser anterior a la fecha de nacimiento.',
+
+                'hypertension_treatment.required' =>
+                'Indique si el paciente recibe tratamiento para Hipertensión Arterial.',
+
+                'hypertension_treatment.boolean' =>
+                'La respuesta sobre tratamiento para Hipertensión Arterial no es válida.',
+
+                'hypertension_treatment_start_date.required_if' =>
+                'Indique la fecha de inicio del tratamiento para Hipertensión Arterial.',
+
+                'hypertension_treatment_start_date.before_or_equal' =>
+                'La fecha de inicio del tratamiento para Hipertensión Arterial no puede ser posterior a hoy.',
+
+                'hypertension_treatment_start_date.after_or_equal' =>
+                'La fecha de inicio del tratamiento para Hipertensión Arterial no puede ser anterior a la fecha de nacimiento.',
+
                 'first_visit_date.before_or_equal' =>
                 'La fecha de primera visita no puede ser posterior a hoy.',
 
                 'first_visit_date.after_or_equal' =>
                 'La fecha de primera visita no puede ser anterior a la fecha de nacimiento.',
-
             ]
         );
+
+        // Si no recibe tratamiento, guardar la fecha como NULL.
+        if (! $request->boolean('diabetes_treatment')) {
+            $data['diabetes_treatment_start_date'] = null;
+        }
+
+        if (! $request->boolean('hypertension_treatment')) {
+            $data['hypertension_treatment_start_date'] = null;
+        }
+
+        return $data;
     }
 }

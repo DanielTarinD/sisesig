@@ -8,6 +8,11 @@ class Patient extends Model
 {
     protected $fillable = [
         'name',
+        'gender',
+        'diabetes_treatment',
+        'diabetes_treatment_start_date',
+        'hypertension_treatment',
+        'hypertension_treatment_start_date',
         'date_of_birth',
         'first_visit_date',
         'colonia',
@@ -18,6 +23,10 @@ class Patient extends Model
         return [
             'date_of_birth' => 'date',
             'first_visit_date' => 'date',
+            'diabetes_treatment' => 'boolean',
+            'diabetes_treatment_start_date' => 'date',
+            'hypertension_treatment' => 'boolean',
+            'hypertension_treatment_start_date' => 'date',
         ];
     }
 
