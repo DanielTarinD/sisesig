@@ -84,10 +84,12 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <strong>Diabetes Mellitus</strong>
 
-                                @if ($patient->diabetes_treatment)
-                                    <span class="badge bg-success">En tratamiento</span>
+                                @if ($patient->diabetes_treatment === null)
+                                    No Sabe
+                                @elseif ($patient->diabetes_treatment)
+                                    En tratamiento
                                 @else
-                                    <span class="badge bg-secondary">Sin tratamiento</span>
+                                    Sin tratamiento
                                 @endif
                             </div>
 
@@ -108,10 +110,12 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <strong>Hipertensión Arterial</strong>
 
-                                @if ($patient->hypertension_treatment)
-                                    <span class="badge bg-success">En tratamiento</span>
+                                @if ($patient->hypertension_treatment === null)
+                                    No Sabe
+                                @elseif ($patient->hypertension_treatment)
+                                    En tratamiento
                                 @else
-                                    <span class="badge bg-secondary">Sin tratamiento</span>
+                                    Sin tratamiento
                                 @endif
                             </div>
 

@@ -532,7 +532,8 @@ class PatientController extends Controller
                 ],
 
                 'diabetes_treatment' => [
-                    'required',
+                    'present',
+                    'nullable',
                     'boolean',
                 ],
 
@@ -545,7 +546,8 @@ class PatientController extends Controller
                 ],
 
                 'hypertension_treatment' => [
-                    'required',
+                    'present',
+                    'nullable',
                     'boolean',
                 ],
 
@@ -639,12 +641,17 @@ class PatientController extends Controller
             ]
         );
 
-        // Si no recibe tratamiento, guardar la fecha como NULL.
-        if (! $request->boolean('diabetes_treatment')) {
+        // Si no recibe tratamiento o no sabe, la fecha queda vacía.
+
+        if (
+            $data['diabetes_treatment'] != 1
+        ) {
             $data['diabetes_treatment_start_date'] = null;
         }
 
-        if (! $request->boolean('hypertension_treatment')) {
+        if (
+            $data['hypertension_treatment'] != 1
+        ) {
             $data['hypertension_treatment_start_date'] = null;
         }
 

@@ -277,9 +277,9 @@
 
 
 
-{{-- =========================================================
+{{-- =====================================================
 TRATAMIENTO DE DIABETES E HIPERTENSIÓN
-========================================================= --}}
+====================================================== --}}
 
 <div class="capture-section">
 
@@ -303,113 +303,203 @@ TRATAMIENTO DE DIABETES E HIPERTENSIÓN
         <div class="row g-3">
 
             {{-- DIABETES MELLITUS --}}
+
             <div class="col-12 col-md-6">
 
-                <div class="border rounded-3 p-3 h-100">
+                <label for="diabetes_treatment" class="form-label capture-label">
+                    ¿Recibe tratamiento para Diabetes Mellitus?
+                    <span class="text-danger">*</span>
+                </label>
 
-                    <div class="fw-semibold mb-3">
-                        <i class="bi bi-capsule me-1"></i>
-                        Diabetes Mellitus
+                <select name="diabetes_treatment" id="diabetes_treatment" class="form-select capture-input">
+
+                    <option value="" @selected(old('diabetes_treatment', isset($patient) ? $patient->diabetes_treatment : '') === null || old('diabetes_treatment', isset($patient) ? $patient->diabetes_treatment : '') === '')>
+                        No Sabe
+                    </option>
+
+                    <option value="0" @selected((string) old('diabetes_treatment', isset($patient) ? $patient->diabetes_treatment : '') === '0')>
+                        No
+                    </option>
+
+                    <option value="1" @selected((string) old('diabetes_treatment', isset($patient) ? $patient->diabetes_treatment : '') === '1')>
+                        Sí
+                    </option>
+
+                </select>
+                <div id="diabetes-unknown-message" class="alert alert-info mt-2 d-none mb-0">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <strong>Tratamiento en curso:</strong> el paciente recibe tratamiento para Diabetes Mellitus, pero
+                    no conoce la fecha de inicio.
+                </div>
+
+                @error('diabetes_treatment')
+                    <div class="invalid-feedback d-block">
+                        {{ $message }}
+                    </div>
+                @enderror
+
+            </div>
+
+            {{-- FECHA DE INICIO DEL TRATAMIENTO PARA DIABETES --}}
+
+            <div class="col-12 col-md-6 d-none" id="diabetes-date-wrapper">
+
+                <div class="treatment-date-card">
+
+                    <div class="treatment-date-header">
+
+                        <div class="treatment-date-icon">
+                            <i class="bi bi-calendar2-check"></i>
+                        </div>
+
+                        <div>
+                            <h6 class="mb-1 fw-bold">
+                                Fecha de inicio del tratamiento
+                            </h6>
+
+                            <small class="text-muted">
+                                Diabetes Mellitus
+                            </small>
+                        </div>
+
                     </div>
 
-                    <label for="diabetes_treatment" class="form-label capture-label">
-                        ¿Recibe tratamiento?
+                    <div class="treatment-date-description">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Indique la fecha en que el paciente comenzó a recibir
+                        tratamiento para la Diabetes Mellitus.
+                    </div>
+
+                    <label for="diabetes_treatment_start_date" class="form-label fw-semibold mt-3">
+
+                        ¿Desde cuándo recibe tratamiento?
+
                         <span class="text-danger">*</span>
+
                     </label>
 
-                    <select name="diabetes_treatment" id="diabetes_treatment" class="form-select capture-input"
-                        required>
+                    <div class="input-group treatment-date-input">
 
-                        <option value="0" @selected((string) old('diabetes_treatment', $patient->diabetes_treatment ?? 0) === '0')>
-                            No
-                        </option>
-
-                        <option value="1" @selected((string) old('diabetes_treatment', $patient->diabetes_treatment ?? 0) === '1')>
-                            Sí
-                        </option>
-
-                    </select>
-
-                    @error('diabetes_treatment')
-                        <div class="invalid-feedback d-block">
-                            {{ $message }}
-                        </div>
-                    @enderror
-
-                    <div id="diabetes-date-wrapper" class="mt-3">
-
-                        <label for="diabetes_treatment_start_date" class="form-label capture-label">
-                            Fecha de inicio del tratamiento
-                        </label>
+                        <span class="input-group-text">
+                            <i class="bi bi-calendar-event"></i>
+                        </span>
 
                         <input type="date" name="diabetes_treatment_start_date" id="diabetes_treatment_start_date"
                             class="form-control capture-input"
                             value="{{ old('diabetes_treatment_start_date', isset($patient) && $patient->diabetes_treatment_start_date ? $patient->diabetes_treatment_start_date->format('Y-m-d') : '') }}">
 
-                        @error('diabetes_treatment_start_date')
-                            <div class="invalid-feedback d-block">
-                                {{ $message }}
-                            </div>
-                        @enderror
-
                     </div>
 
-                </div>
-
-            </div>
-
-
-            {{-- HIPERTENSIÓN ARTERIAL --}}
-            <div class="col-12 col-md-6">
-
-                <div class="border rounded-3 p-3 h-100">
-
-                    <div class="fw-semibold mb-3">
-                        <i class="bi bi-heart-pulse me-1"></i>
-                        Hipertensión Arterial
+                    <div class="form-text">
+                        Seleccione el día, mes y año en que inició el tratamiento.
                     </div>
 
-                    <label for="hypertension_treatment" class="form-label capture-label">
-                        ¿Recibe tratamiento?
-                        <span class="text-danger">*</span>
-                    </label>
-
-                    <select name="hypertension_treatment" id="hypertension_treatment"
-                        class="form-select capture-input" required>
-
-                        <option value="0" @selected((string) old('hypertension_treatment', $patient->hypertension_treatment ?? 0) === '0')>
-                            No
-                        </option>
-
-                        <option value="1" @selected((string) old('hypertension_treatment', $patient->hypertension_treatment ?? 0) === '1')>
-                            Sí
-                        </option>
-
-                    </select>
-
-                    @error('hypertension_treatment')
+                    @error('diabetes_treatment_start_date')
                         <div class="invalid-feedback d-block">
                             {{ $message }}
                         </div>
                     @enderror
 
-                    <div id="hypertension-date-wrapper" class="mt-3">
+                </div>
 
-                        <label for="hypertension_treatment_start_date" class="form-label capture-label">
-                            Fecha de inicio del tratamiento
-                        </label>
+            </div>
+
+            {{-- HIPERTENSIÓN ARTERIAL --}}
+
+            <div class="col-12 col-md-6">
+
+                <label for="hypertension_treatment" class="form-label capture-label">
+                    ¿Recibe tratamiento para Hipertensión Arterial?
+                    <span class="text-danger">*</span>
+                </label>
+
+                <select name="hypertension_treatment" id="hypertension_treatment" class="form-select capture-input">
+
+                    <option value="" @selected(old('hypertension_treatment', isset($patient) ? $patient->hypertension_treatment : '') === null || old('hypertension_treatment', isset($patient) ? $patient->hypertension_treatment : '') === '')>
+                        No Sabe
+                    </option>
+
+                    <option value="0" @selected((string) old('hypertension_treatment', isset($patient) ? $patient->hypertension_treatment : '') === '0')>
+                        No
+                    </option>
+
+                    <option value="1" @selected((string) old('hypertension_treatment', isset($patient) ? $patient->hypertension_treatment : '') === '1')>
+                        Sí
+                    </option>
+
+                </select>
+
+                <div id="hypertension-unknown-message" class="alert alert-info mt-2 d-none mb-0">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <strong>Tratamiento en curso:</strong> el paciente recibe tratamiento para Hipertensión Arterial,
+                    pero no conoce la fecha de inicio.
+                </div>
+                @error('hypertension_treatment')
+                    <div class="invalid-feedback d-block">
+                        {{ $message }}
+                    </div>
+                @enderror
+
+            </div>
+            {{-- FECHA DE INICIO DEL TRATAMIENTO PARA HIPERTENSIÓN --}}
+
+            <div class="col-12 col-md-6 d-none" id="hypertension-date-wrapper">
+
+                <div class="treatment-date-card">
+
+                    <div class="treatment-date-header">
+
+                        <div class="treatment-date-icon">
+                            <i class="bi bi-calendar2-check"></i>
+                        </div>
+
+                        <div>
+                            <h6 class="mb-1 fw-bold">
+                                Fecha de inicio del tratamiento
+                            </h6>
+
+                            <small class="text-muted">
+                                Hipertensión Arterial
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <div class="treatment-date-description">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Indique la fecha en que el paciente comenzó a recibir
+                        tratamiento para la Hipertensión Arterial.
+                    </div>
+
+                    <label for="hypertension_treatment_start_date" class="form-label fw-semibold mt-3">
+
+                        ¿Desde cuándo recibe tratamiento?
+
+                        <span class="text-danger">*</span>
+
+                    </label>
+
+                    <div class="input-group treatment-date-input">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-calendar-event"></i>
+                        </span>
 
                         <input type="date" name="hypertension_treatment_start_date"
                             id="hypertension_treatment_start_date" class="form-control capture-input"
                             value="{{ old('hypertension_treatment_start_date', isset($patient) && $patient->hypertension_treatment_start_date ? $patient->hypertension_treatment_start_date->format('Y-m-d') : '') }}">
 
-                        @error('hypertension_treatment_start_date')
-                            <div class="invalid-feedback d-block">
-                                {{ $message }}
-                            </div>
-                        @enderror
-
                     </div>
+
+                    <div class="form-text">
+                        Seleccione el día, mes y año en que inició el tratamiento.
+                    </div>
+
+                    @error('hypertension_treatment_start_date')
+                        <div class="invalid-feedback d-block">
+                            {{ $message }}
+                        </div>
+                    @enderror
 
                 </div>
 
@@ -420,7 +510,6 @@ TRATAMIENTO DE DIABETES E HIPERTENSIÓN
     </div>
 
 </div>
-
 
 {{-- =========================================================
 
@@ -904,42 +993,61 @@ SCRIPT
             syncFirstVisit();
 
             /* ==========================================================
-               FECHAS DE INICIO DE TRATAMIENTO
-               ========================================================== */
+       FECHAS DE INICIO DE TRATAMIENTO
+       ========================================================== */
 
             const syncTreatmentDate = function(
                 treatmentSelector,
                 dateSelector,
-                wrapperSelector
+                wrapperSelector,
+                messageSelector
             ) {
-                const receivesTreatment = $(treatmentSelector).val() === '1';
+
+                const treatmentValue = $(treatmentSelector).val();
+
+                const receivesTreatment = treatmentValue === '1';
+                const treatmentUnknown = treatmentValue === '';
+
                 const input = $(dateSelector);
                 const wrapper = $(wrapperSelector);
+                const message = $(messageSelector);
 
+                // Mostrar fecha únicamente cuando selecciona "Sí"
                 input.prop('disabled', !receivesTreatment);
                 input.prop('required', receivesTreatment);
 
                 wrapper.toggleClass('d-none', !receivesTreatment);
 
+                // Mostrar aviso cuando selecciona "No Sabe"
+                message.toggleClass('d-none', !treatmentUnknown);
+
+                // Limpiar fecha si no selecciona "Sí"
                 if (!receivesTreatment) {
                     input.val('');
                 }
+
             };
 
             const syncDiabetesTreatmentDate = function() {
+
                 syncTreatmentDate(
                     '#diabetes_treatment',
                     '#diabetes_treatment_start_date',
-                    '#diabetes-date-wrapper'
+                    '#diabetes-date-wrapper',
+                    '#diabetes-unknown-message'
                 );
+
             };
 
             const syncHypertensionTreatmentDate = function() {
+
                 syncTreatmentDate(
                     '#hypertension_treatment',
                     '#hypertension_treatment_start_date',
-                    '#hypertension-date-wrapper'
+                    '#hypertension-date-wrapper',
+                    '#hypertension-unknown-message'
                 );
+
             };
 
             $('#diabetes_treatment').on(
@@ -952,11 +1060,8 @@ SCRIPT
                 syncHypertensionTreatmentDate
             );
 
-            // Ejecutar al cargar el formulario
             syncDiabetesTreatmentDate();
             syncHypertensionTreatmentDate();
-
-
             /*
 
             ==========================================================
@@ -2582,9 +2687,9 @@ SCRIPT
 
         /* =========================================================
 
-                                                               DROPDOWN
+                                                                                               DROPDOWN
 
-                                                               ========================================================= */
+                                                                                               ========================================================= */
 
 
 
@@ -2698,9 +2803,9 @@ SCRIPT
 
         /* =========================================================
 
-                                                               RESULTADOS
+                                                                                               RESULTADOS
 
-                                                               ========================================================= */
+                                                                                               ========================================================= */
 
 
 
@@ -2792,9 +2897,9 @@ SCRIPT
 
         /* =========================================================
 
-                                                               AGREGAR COLONIA
+                                                                                               AGREGAR COLONIA
 
-                                                               ========================================================= */
+                                                                                               ========================================================= */
 
 
 
@@ -2862,9 +2967,9 @@ SCRIPT
 
         /* =========================================================
 
-                                                               MENSAJES
+                                                                                               MENSAJES
 
-                                                               ========================================================= */
+                                                                                               ========================================================= */
 
 
 
@@ -2888,9 +2993,9 @@ SCRIPT
 
         /* =========================================================
 
-                                                               MOBILE
+                                                                                               MOBILE
 
-                                                               ========================================================= */
+                                                                                               ========================================================= */
 
 
 
@@ -2968,6 +3073,98 @@ SCRIPT
 
 
 
+        }
+
+        /* =========================================================
+                   TARJETA DE FECHA DE INICIO DE TRATAMIENTO
+                   ========================================================= */
+
+        .treatment-date-card {
+            background: #f8fbff;
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 4px;
+            transition: all .2s ease;
+        }
+
+        .treatment-date-card:hover {
+            border-color: #93c5fd;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, .06);
+        }
+
+        /* Encabezado */
+
+        .treatment-date-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .treatment-date-icon {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #dbeafe;
+            color: #2563eb;
+            border-radius: 12px;
+            font-size: 1.25rem;
+        }
+
+        /* Información */
+
+        .treatment-date-description {
+            margin-top: 14px;
+            padding: 10px 12px;
+            background: #eff6ff;
+            border-radius: 8px;
+            color: #475569;
+            font-size: .875rem;
+            line-height: 1.5;
+        }
+
+        /* Campo de fecha */
+
+        .treatment-date-input .input-group-text {
+            background: #ffffff;
+            border-color: #ced4da;
+            color: #2563eb;
+            font-size: 1.1rem;
+        }
+
+        .treatment-date-input input {
+            min-height: 48px;
+            background-color: #ffffff;
+            border-color: #ced4da;
+            border-radius: 0 8px 8px 0;
+            font-size: 1rem;
+        }
+
+        .treatment-date-input input:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .12);
+        }
+
+        .treatment-date-card .form-text {
+            margin-top: 8px;
+            color: #64748b;
+            font-size: .8rem;
+        }
+
+        /* Adaptación móvil */
+
+        @media (max-width: 767.98px) {
+            .treatment-date-card {
+                padding: 14px;
+            }
+
+            .treatment-date-input input {
+                min-height: 50px;
+                font-size: 16px;
+            }
         }
     </style>
 @endpush

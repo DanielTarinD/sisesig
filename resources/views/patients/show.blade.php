@@ -6,8 +6,8 @@
 
     <style>
         /* =========================================================
-               ENCABEZADO
-               ========================================================= */
+                       ENCABEZADO
+                       ========================================================= */
 
         .patient-header {
             display: flex;
@@ -38,8 +38,8 @@
 
 
         /* =========================================================
-               SECCIONES
-               ========================================================= */
+                       SECCIONES
+                       ========================================================= */
 
         .capture-section {
             background: #fff;
@@ -81,8 +81,8 @@
 
 
         /* =========================================================
-               RESUMEN DEL PACIENTE
-               ========================================================= */
+                       RESUMEN DEL PACIENTE
+                       ========================================================= */
 
         .patient-summary-item {
             min-height: 58px;
@@ -111,8 +111,8 @@
 
 
         /* =========================================================
-               CAPTURA
-               ========================================================= */
+                       CAPTURA
+                       ========================================================= */
 
         .followup-input {
             min-height: 50px;
@@ -165,8 +165,8 @@
 
 
         /* =========================================================
-               HISTÓRICO
-               ========================================================= */
+                       HISTÓRICO
+                       ========================================================= */
 
         .followup-history-header {
             padding: 1.25rem 1.5rem;
@@ -199,8 +199,8 @@
 
 
         /* =========================================================
-               MÓVIL
-               ========================================================= */
+                       MÓVIL
+                       ========================================================= */
 
         .followup-mobile {
             display: none;
@@ -271,8 +271,8 @@
 
 
         /* =========================================================
-               RESPONSIVE
-               ========================================================= */
+                       RESPONSIVE
+                       ========================================================= */
 
         @media (max-width: 767.98px) {
 
@@ -342,8 +342,8 @@
 
 
         /* =========================================================
-               IMPRESIÓN
-               ========================================================= */
+                       IMPRESIÓN
+                       ========================================================= */
 
         @media print {
 
@@ -552,10 +552,12 @@
                                         Diabetes Mellitus
                                     </div>
 
-                                    @if ($patient->diabetes_treatment)
+                                    @if ($patient->diabetes_treatment === null)
+                                        <span class="badge bg-secondary">No Sabe</span>
+                                    @elseif ($patient->diabetes_treatment)
                                         <span class="badge bg-success">En tratamiento</span>
                                     @else
-                                        <span class="badge bg-secondary">Sin tratamiento</span>
+                                        <span class="badge bg-danger">Sin tratamiento</span>
                                     @endif
 
                                 </div>
@@ -593,10 +595,12 @@
                                         Hipertensión Arterial
                                     </div>
 
-                                    @if ($patient->hypertension_treatment)
+                                    @if ($patient->hypertension_treatment === null)
+                                        <span class="badge bg-secondary">No Sabe</span>
+                                    @elseif ($patient->hypertension_treatment)
                                         <span class="badge bg-success">En tratamiento</span>
                                     @else
-                                        <span class="badge bg-secondary">Sin tratamiento</span>
+                                        <span class="badge bg-danger">Sin tratamiento</span>
                                     @endif
 
                                 </div>
