@@ -9,6 +9,7 @@ class FollowUp extends Model
     protected $fillable = [
         'patient_id',
         'date',
+        'sample_collection_date',
         'blood_pressure',
         'respiratory_rate',
         'pulse',
@@ -22,6 +23,7 @@ class FollowUp extends Model
     {
         return [
             'date' => 'datetime',
+            'sample_collection_date' => 'date',
             'without_fasting' => 'boolean',
         ];
     }

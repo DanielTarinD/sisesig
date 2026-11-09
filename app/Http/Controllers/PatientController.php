@@ -316,6 +316,13 @@ class PatientController extends Controller
                 'before_or_equal:today',
             ],
 
+            'sample_collection_date' => [
+                'required',
+                'date',
+                'before_or_equal:today',
+                'after_or_equal:date_of_birth',
+            ],
+
             'patient_id' => [
                 'nullable',
                 'integer',
@@ -638,6 +645,9 @@ class PatientController extends Controller
 
                 'first_visit_date.after_or_equal' =>
                 'La fecha de primera visita no puede ser anterior a la fecha de nacimiento.',
+
+                
+
             ]
         );
 

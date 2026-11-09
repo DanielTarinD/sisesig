@@ -6,8 +6,8 @@
 
     <style>
         /* =========================================================
-                       ENCABEZADO
-                       ========================================================= */
+                           ENCABEZADO
+                           ========================================================= */
 
         .patient-header {
             display: flex;
@@ -38,8 +38,8 @@
 
 
         /* =========================================================
-                       SECCIONES
-                       ========================================================= */
+                           SECCIONES
+                           ========================================================= */
 
         .capture-section {
             background: #fff;
@@ -81,8 +81,8 @@
 
 
         /* =========================================================
-                       RESUMEN DEL PACIENTE
-                       ========================================================= */
+                           RESUMEN DEL PACIENTE
+                           ========================================================= */
 
         .patient-summary-item {
             min-height: 58px;
@@ -111,8 +111,8 @@
 
 
         /* =========================================================
-                       CAPTURA
-                       ========================================================= */
+                           CAPTURA
+                           ========================================================= */
 
         .followup-input {
             min-height: 50px;
@@ -165,8 +165,8 @@
 
 
         /* =========================================================
-                       HISTÓRICO
-                       ========================================================= */
+                           HISTÓRICO
+                           ========================================================= */
 
         .followup-history-header {
             padding: 1.25rem 1.5rem;
@@ -199,8 +199,8 @@
 
 
         /* =========================================================
-                       MÓVIL
-                       ========================================================= */
+                           MÓVIL
+                           ========================================================= */
 
         .followup-mobile {
             display: none;
@@ -271,8 +271,8 @@
 
 
         /* =========================================================
-                       RESPONSIVE
-                       ========================================================= */
+                           RESPONSIVE
+                           ========================================================= */
 
         @media (max-width: 767.98px) {
 
@@ -342,8 +342,8 @@
 
 
         /* =========================================================
-                       IMPRESIÓN
-                       ========================================================= */
+                           IMPRESIÓN
+                           ========================================================= */
 
         @media print {
 
@@ -531,6 +531,125 @@
                 </div>
 
 
+                {{-- =========================================================
+     TRATAMIENTO PARA DIABETES MELLITUS
+     ========================================================= --}}
+
+                <div class="col-6 col-md-3">
+
+                    <div class="patient-summary-item">
+
+                        <span class="patient-summary-label">
+                            Tratamiento para Diabetes Mellitus
+                        </span>
+
+                        <div class="patient-summary-value">
+
+                            @if ($patient->diabetes_treatment)
+                                <span class="badge bg-success">Sí</span>
+                            @else
+                                <span class="badge bg-secondary">No</span>
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- =========================================================
+     FECHA DE INICIO DE TRATAMIENTO PARA DIABETES
+     ========================================================= --}}
+
+                <div class="col-6 col-md-3">
+
+                    <div class="patient-summary-item">
+
+                        <span class="patient-summary-label">
+                            Inicio de tratamiento DM
+                        </span>
+
+                        <div class="patient-summary-value">
+
+                            {{ $patient->diabetes_treatment_start_date?->format('d/m/Y') ?? '—' }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- =========================================================
+     TRATAMIENTO PARA HIPERTENSIÓN ARTERIAL
+     ========================================================= --}}
+
+                <div class="col-6 col-md-3">
+
+                    <div class="patient-summary-item">
+
+                        <span class="patient-summary-label">
+                            Tratamiento para Hipertensión Arterial
+                        </span>
+
+                        <div class="patient-summary-value">
+
+                            @if ($patient->hypertension_treatment)
+                                <span class="badge bg-success">Sí</span>
+                            @else
+                                <span class="badge bg-secondary">No</span>
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- =========================================================
+     FECHA DE INICIO DE TRATAMIENTO PARA HIPERTENSIÓN
+     ========================================================= --}}
+
+                <div class="col-6 col-md-3">
+
+                    <div class="patient-summary-item">
+
+                        <span class="patient-summary-label">
+                            Inicio de tratamiento HAS
+                        </span>
+
+                        <div class="patient-summary-value">
+
+                            {{ $patient->hypertension_treatment_start_date?->format('d/m/Y') ?? '—' }}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                {{-- GÉNERO --}}
+                <div class="col-6 col-md-3">
+
+                    <div class="patient-summary-item">
+
+                        <span class="patient-summary-label">
+                            Género
+                        </span>
+
+                        <div class="patient-summary-value">
+                            {{ $patient->gender ?: '—' }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+
                 {{-- TRATAMIENTOS --}}
                 <div class="col-12">
 
@@ -552,12 +671,10 @@
                                         Diabetes Mellitus
                                     </div>
 
-                                    @if ($patient->diabetes_treatment === null)
-                                        <span class="badge bg-secondary">No Sabe</span>
-                                    @elseif ($patient->diabetes_treatment)
+                                    @if ($patient->diabetes_treatment)
                                         <span class="badge bg-success">En tratamiento</span>
                                     @else
-                                        <span class="badge bg-danger">Sin tratamiento</span>
+                                        <span class="badge bg-secondary">Sin tratamiento</span>
                                     @endif
 
                                 </div>
@@ -595,12 +712,10 @@
                                         Hipertensión Arterial
                                     </div>
 
-                                    @if ($patient->hypertension_treatment === null)
-                                        <span class="badge bg-secondary">No Sabe</span>
-                                    @elseif ($patient->hypertension_treatment)
+                                    @if ($patient->hypertension_treatment)
                                         <span class="badge bg-success">En tratamiento</span>
                                     @else
-                                        <span class="badge bg-danger">Sin tratamiento</span>
+                                        <span class="badge bg-secondary">Sin tratamiento</span>
                                     @endif
 
                                 </div>
@@ -677,7 +792,7 @@
                     </h5>
 
                     <small class="text-muted">
-                        La fecha y hora se registran automáticamente
+                        Seleccione la fecha en que se realizó el seguimiento
                     </small>
                 </div>
 
@@ -711,6 +826,21 @@
 
 
                     <div class="row g-3">
+
+                        {{-- FECHA DE SEGUIMIENTO --}}
+                        <div class="col-12 col-md-4">
+
+                            <label class="form-label followup-label" for="date">
+                                Fecha de seguimiento
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="date" name="date" id="date" class="form-control followup-input"
+                                value="{{ old('date', now()->format('Y-m-d')) }}" max="{{ now()->format('Y-m-d') }}"
+                                required>
+
+                        </div>
+
 
                         {{-- TENSIÓN ARTERIAL --}}
                         <div class="col-6 col-md-4">
@@ -906,7 +1036,7 @@
 
                     <tr>
 
-                        <th>Fecha</th>
+                        <th>Fecha de seguimiento</th>
                         <th>TA</th>
                         <th>FR</th>
                         <th>Pulso</th>

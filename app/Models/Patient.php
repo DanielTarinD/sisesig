@@ -15,6 +15,7 @@ class Patient extends Model
         'hypertension_treatment_start_date',
         'date_of_birth',
         'first_visit_date',
+        'sample_collection_date',
         'colonia',
     ];
 
