@@ -359,6 +359,14 @@ class ReportController extends Controller
             'to' => ['nullable', 'date', 'after_or_equal:from'],
         ]);
 
+        // Si no se especifica ningún filtro, mostrar únicamente las atenciones de hoy.
+        // Cuando el usuario proporciona un rango, respetar las fechas seleccionadas.
+        if (empty($data['from']) && empty($data['to'])) {
+            $today = now()->toDateString();
+
+            return [$today, $today];
+        }
+
         return [
             $data['from'] ?? null,
             $data['to'] ?? null,

@@ -6,201 +6,54 @@
 @push('styles')
 
 <style>
-
-/* =========================================================
-   TARJETAS MÓVILES
-   ========================================================= */
-
-.patient-mobile-card {
-
-    border-bottom: 1px solid #e9ecef;
-
-    padding: 1rem;
-
-}
-
-
-.patient-mobile-card:last-child {
-
-    border-bottom: 0;
-
-}
-
-
-.patient-name {
-
-    font-weight: 700;
-
-    line-height: 1.2;
-
-}
-
-
-.patient-data {
-
-    font-size: .88rem;
-
-    color: #6c757d;
-
-}
-
-
-.patient-data strong {
-
-    color: #495057;
-
-}
-
-
-.patient-open {
-
-    min-width: 85px;
-
-}
-
-
-/* =========================================================
-   FILTROS
-   ========================================================= */
-
-.patient-search {
-
-    border-radius: 14px;
-
-}
-
-
-.patient-search-label {
-
-    font-size: .82rem;
-
-    font-weight: 600;
-
-    color: #495057;
-
-    margin-bottom: .35rem;
-
-}
-
-
-.patient-search .form-control,
-.patient-search .form-select {
-
-    min-height: 44px;
-
-    border-radius: 10px;
-
-}
-
-
-.patient-search .form-control:focus,
-.patient-search .form-select:focus {
-
-    border-color: #86b7fe;
-
-    box-shadow:
-        0 0 0 .15rem rgba(13, 110, 253, .10);
-
-}
-
-
-/* =========================================================
-   RESULTADOS
-   ========================================================= */
-
-.patient-results-count {
-
-    font-size: .85rem;
-
-    color: #6c757d;
-
-}
-
-
-/* =========================================================
-   ESCRITORIO
-   ========================================================= */
-
-@media (min-width: 768px) {
-
-    .patient-search-actions {
-
-        display: flex;
-
-        align-items: end;
-
-        gap: .5rem;
-
-    }
-
-}
-
-
-/* =========================================================
-   MÓVIL
-   ========================================================= */
-
+/* Diseño renovado del catálogo de pacientes */
+.patients-heading { padding: .35rem 0 .85rem; }
+.patients-heading h2 { color: #172b4d; font-size: 1.75rem; letter-spacing: -.035em; }
+.patients-heading p { color: #718096 !important; font-size: .94rem; }
+.patients-heading .btn { border-radius: 10px; padding: .65rem 1rem; font-weight: 600; box-shadow: 0 3px 10px rgba(13,110,253,.12); }
+.patient-search { background: #fff; border: 1px solid #e7edf4; border-radius: 16px; padding: 1.25rem !important; box-shadow: 0 5px 20px rgba(24, 46, 75, .045); }
+.patient-search-label { color: #526176; font-size: .78rem; font-weight: 700; letter-spacing: .035em; text-transform: uppercase; margin-bottom: .5rem; }
+.patient-search .form-control, .patient-search .form-select { border: 1px solid #dce4ed; border-radius: 10px; min-height: 43px; font-size: .92rem; background-color: #fbfcfe; }
+.patient-search .form-control:focus, .patient-search .form-select:focus { background: #fff; border-color: #8ab9f7; box-shadow: 0 0 0 .22rem rgba(13,110,253,.10); }
+.patient-search-actions { display: flex; align-items: end; gap: .5rem; height: 100%; }
+.patient-search-actions .btn { border-radius: 10px; min-height: 43px; padding-inline: .9rem; font-weight: 600; white-space: nowrap; }
+.patient-results-count { color: #64748b; font-size: .88rem; padding: .45rem .1rem .75rem; }
+.patient-results-count strong { color: #1e293b; font-weight: 700; }
+.patient-results-card { border: 1px solid #e5ebf2; border-radius: 16px; overflow: hidden; box-shadow: 0 5px 22px rgba(24,46,75,.045); background: #fff; }
+.patient-results-card .table { color: #334155; }
+.patient-results-card .table thead th { background: #f5f8fc; color: #64748b; border-bottom: 1px solid #e5ebf2; font-size: .73rem; font-weight: 700; letter-spacing: .045em; text-transform: uppercase; padding: .95rem .85rem; white-space: nowrap; }
+.patient-results-card .table tbody td { padding: .9rem .85rem; vertical-align: middle; border-color: #edf1f6; font-size: .88rem; }
+.patient-results-card .table tbody tr { transition: background-color .15s ease; }
+.patient-results-card .table tbody tr:hover { background: #f7faff; }
+.patient-results-card .table tbody td:first-child { color: #1e293b; font-weight: 600; }
+.patient-results-card .btn { border-radius: 8px; font-weight: 600; padding: .38rem .65rem; white-space: nowrap; }
+.patient-mobile-card { border-bottom: 1px solid #edf1f6; padding: 1rem 1.1rem; background: #fff; }
+.patient-mobile-card:last-child { border-bottom: 0; }
+.patient-mobile-card:active { background: #f8fbff; }
+.patient-name { color: #1e293b; font-size: 1rem; font-weight: 700; line-height: 1.3; }
+.patient-data { color: #64748b; font-size: .83rem; line-height: 1.65; }
+.patient-data strong { color: #475569; font-weight: 600; }
+.patient-open { border-radius: 9px; min-width: 78px; font-weight: 600; }
+/* Paginación simplificada: anterior | página actual | siguiente */
+.patient-pagination { margin-top: 1.15rem !important; }
+.patient-pagination-bar { display: flex; justify-content: center; align-items: center; gap: .85rem; flex-wrap: wrap; }
+.patient-pagination-btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 38px; padding: .45rem .85rem; border: 1px solid #dbe3ed; border-radius: 9px; background: #fff; color: #334155; font-size: .85rem; font-weight: 600; text-decoration: none; transition: background-color .15s ease, border-color .15s ease; }
+.patient-pagination-btn:hover { background: #f3f7fc; border-color: #b9c9dc; color: #1d4ed8; }
+.patient-pagination-btn.is-disabled { background: #f8fafc; color: #a0aec0; border-color: #e8edf3; cursor: not-allowed; pointer-events: none; }
+.patient-pagination-status { color: #64748b; font-size: .88rem; white-space: nowrap; }
+.patient-pagination-status strong { color: #1e293b; font-weight: 700; }
+@media (max-width: 420px) { .patient-pagination-bar { gap: .5rem; } .patient-pagination-btn { padding: .4rem .65rem; } .patient-pagination-status { font-size: .82rem; } }
+@media (min-width: 768px) { .patient-search-actions { justify-content: flex-start; } }
 @media (max-width: 767.98px) {
-
-    .patients-heading {
-
-        align-items: stretch !important;
-
-    }
-
-
-    .patients-heading .btn {
-
-        width: 100%;
-
-    }
-
-
-    .patient-search {
-
-        padding: .9rem !important;
-
-    }
-
-
-    .patient-search-actions {
-
-        display: flex;
-
-        flex-direction: column;
-
-        gap: .5rem;
-
-    }
-
-
-    .patient-search-actions .btn {
-
-        width: 100%;
-
-    }
-
-
-    .patient-search .form-control,
-    .patient-search .form-select {
-
-        min-height: 48px;
-
-        font-size: 16px;
-
-    }
-
-
-    .patient-name {
-
-        max-width: 65vw;
-
-        word-break: break-word;
-
-    }
-
+  .patients-heading { align-items: stretch !important; }
+  .patients-heading h2 { font-size: 1.5rem; }
+  .patients-heading .btn { width: 100%; }
+  .patient-search { padding: 1rem !important; }
+  .patient-search-actions { flex-direction: row; }
+  .patient-search-actions .btn { flex: 1; }
+  .patient-search .form-control, .patient-search .form-select { min-height: 46px; font-size: 16px; }
+  .patient-name { max-width: 65vw; overflow-wrap: anywhere; }
 }
-
 </style>
 
 @endpush
@@ -463,7 +316,7 @@
      RESULTADOS
      ====================================================== --}}
 
-<div class="card">
+<div class="card patient-results-card">
 
 
     {{-- ==================================================
@@ -791,9 +644,43 @@
      PAGINACIÓN
      ====================================================== --}}
 
-<div class="mt-3">
+<div class="mt-3 patient-pagination">
 
-    {{ $patients->links() }}
+    @if($patients->lastPage() > 1)
+
+        <div class="patient-pagination-bar" aria-label="Paginación de pacientes">
+
+            @if($patients->onFirstPage())
+                <span class="patient-pagination-btn is-disabled" aria-disabled="true">
+                    <i class="bi bi-chevron-left"></i>
+                    Anterior
+                </span>
+            @else
+                <a class="patient-pagination-btn" href="{{ $patients->appends(request()->query())->previousPageUrl() }}" rel="prev">
+                    <i class="bi bi-chevron-left"></i>
+                    Anterior
+                </a>
+            @endif
+
+            <span class="patient-pagination-status">
+                Página <strong>{{ $patients->currentPage() }}</strong> de <strong>{{ $patients->lastPage() }}</strong>
+            </span>
+
+            @if($patients->hasMorePages())
+                <a class="patient-pagination-btn" href="{{ $patients->appends(request()->query())->nextPageUrl() }}" rel="next">
+                    Siguiente
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            @else
+                <span class="patient-pagination-btn is-disabled" aria-disabled="true">
+                    Siguiente
+                    <i class="bi bi-chevron-right"></i>
+                </span>
+            @endif
+
+        </div>
+
+    @endif
 
 </div>
 
