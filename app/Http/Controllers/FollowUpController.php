@@ -31,6 +31,42 @@ class FollowUpController extends Controller
 
         return back()->with('success', 'Seguimiento registrado correctamente.');
     }
+    public function edit(FollowUp $followUp)
+    {
+        $followUp->load('patient');
+
+        return view('followups.edit', compact('followUp'));
+    }
+
+    public function update(Request $request, FollowUp $followUp)
+    {
+        $data = $request->validate([
+            'date' => ['required', 'date', 'before_or_equal:today'],
+            'time' => ['required', 'date_format:H:i'],
+            'blood_pressure' => ['required', 'string', 'max:50'],
+            'respiratory_rate' => ['required', 'string', 'max:50'],
+            'pulse' => ['required', 'string', 'max:50'],
+            'spo2' => ['required', 'string', 'max:50'],
+            'temperature' => ['required', 'string', 'max:50'],
+            'without_fasting' => ['nullable', 'boolean'],
+            'capillary_glucose' => ['nullable', 'string', 'max:50'],
+        ]);
+
+        $data['date'] = \Carbon\Carbon::createFromFormat(
+            'Y-m-d H:i',
+            $data['date'] . ' ' . $data['time']
+        );
+
+        unset($data['time']);
+        $data['without_fasting'] = $request->boolean('without_fasting');
+
+        $followUp->update($data);
+
+        return redirect()
+            ->route('patients.show', $followUp->patient_id)
+            ->with('success', 'Atención modificada correctamente.');
+    }
+
     public function destroy(FollowUp $followUp)
     {
         $followUp->delete();
