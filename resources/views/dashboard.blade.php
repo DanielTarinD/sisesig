@@ -63,6 +63,159 @@
         min-width: 90px;
     }
 
+    /* Impresión del reporte de comorbilidades en papel carta */
+    .print-report-heading { display: none; }
+
+    @page {
+        size: letter portrait;
+        margin: 12mm;
+    }
+
+    @media print {
+        html, body {
+            width: 8.5in;
+            min-height: 11in;
+            background: #fff !important;
+            color: #212529 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body * {
+            visibility: hidden !important;
+        }
+
+        #comorbidityReport,
+        #comorbidityReport * {
+            visibility: visible !important;
+        }
+
+        #comorbidityReport {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            border: 1px solid #adb5bd !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        #comorbidityReport .card-body {
+            padding: 7mm !important;
+        }
+
+        #comorbidityReport .print-report-heading {
+            display: block !important;
+            text-align: center;
+            border-bottom: 1px solid #adb5bd;
+            padding-bottom: 4mm;
+            margin-bottom: 5mm;
+        }
+
+        #comorbidityReport .print-report-heading h1 {
+            font-size: 16pt;
+            font-weight: 700;
+            margin: 0 0 2mm;
+        }
+
+        #comorbidityReport .print-report-heading p {
+            font-size: 9pt;
+            margin: 0;
+        }
+
+        #comorbidityReport .no-print {
+            display: none !important;
+        }
+
+        /* Orden de impresión: gráfica arriba, cuadro de datos y narración debajo */
+        #comorbidityReport .row {
+            display: flex !important;
+            flex-direction: column !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            gap: 3mm !important;
+        }
+
+        #comorbidityReport .col-12,
+        #comorbidityReport .col-lg-6 {
+            width: 100% !important;
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+
+        /* Gráfica centrada en la parte superior */
+        #comorbidityReport .pie-print-container {
+            width: 100% !important;
+            max-width: 3.55in !important;
+            height: 3.05in !important;
+            margin: 0 auto !important;
+        }
+
+        /* Cuadro de cantidades centrado debajo de la gráfica */
+        #comorbidityReport .list-group {
+            width: 78% !important;
+            max-width: 5.8in !important;
+            margin: 2mm auto 0 !important;
+        }
+
+        #comorbidityReport .list-group-item {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 3mm 2mm !important;
+            font-size: 10pt !important;
+            background: #fff !important;
+            border-bottom: 1px solid #ced4da !important;
+        }
+
+        /* Narración debajo del cuadro, con texto justificado */
+        #comorbidityReport .alert {
+            width: 90% !important;
+            max-width: 6.2in !important;
+            margin: 4mm auto 0 !important;
+            text-align: center !important;
+            background: #f8f9fa !important;
+            border: 1px solid #adb5bd !important;
+            color: #212529 !important;
+            padding: 4mm !important;
+        }
+
+        #comorbidityReport .alert .fw-semibold {
+            text-align: center !important;
+        }
+
+        #comorbidityReport .alert p {
+            text-align: justify !important;
+            text-justify: inter-word !important;
+            margin-top: 2mm !important;
+        }
+
+        #comorbidityReport .badge {
+            border: 1px solid #adb5bd !important;
+            background: #fff !important;
+            color: #212529 !important;
+            font-size: 9pt !important;
+        }
+
+
+        #comorbidityReport .text-muted,
+        #comorbidityReport .small {
+            color: #495057 !important;
+        }
+
+        #comorbidityReport h5 {
+            font-size: 13pt !important;
+        }
+
+        #comorbidityReport p {
+            font-size: 9.5pt !important;
+            line-height: 1.45 !important;
+        }
+    }
+
     @media (max-width: 767.98px) {
         .dashboard-number {
             font-size: 1.7rem;
@@ -107,31 +260,35 @@
             </p>
         </div>
 
-        {{-- Periodo --}}
-        <div class="period-buttons btn-group" role="group">
+        {{-- Filtro de fechas y periodos rápidos --}}
+        <div class="d-flex flex-column gap-2">
+            <form method="GET" action="{{ route('dashboard') }}" class="d-flex flex-column flex-sm-row align-items-end gap-2">
+                <div>
+                    <label for="start_date" class="form-label small mb-1">Fecha inicial</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control"
+                           value="{{ $startDate->format('Y-m-d') }}" required>
+                </div>
+                <div>
+                    <label for="end_date" class="form-label small mb-1">Fecha final</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control"
+                           value="{{ $endDate->format('Y-m-d') }}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-filter me-1"></i> Consultar
+                </button>
+            </form>
 
-            <a href="{{ route('dashboard', ['period' => 'today']) }}"
-               class="btn {{ $period === 'today' ? 'btn-primary' : 'btn-outline-primary' }}">
-                Hoy
-            </a>
-
-            <a href="{{ route('dashboard', ['period' => 'week']) }}"
-               class="btn {{ $period === 'week' ? 'btn-primary' : 'btn-outline-primary' }}">
-                Semana
-            </a>
-
-            <a href="{{ route('dashboard', ['period' => 'month']) }}"
-               class="btn {{ $period === 'month' ? 'btn-primary' : 'btn-outline-primary' }}">
-                Mes
-            </a>
-
-            <a href="{{ route('dashboard', ['period' => 'year']) }}"
-               class="btn {{ $period === 'year' ? 'btn-primary' : 'btn-outline-primary' }}">
-                Año
-            </a>
-
+            <div class="period-buttons btn-group" role="group" aria-label="Periodos rápidos">
+                <a href="{{ route('dashboard', ['period' => 'today']) }}"
+                   class="btn btn-sm {{ $period === 'today' ? 'btn-primary' : 'btn-outline-primary' }}">Hoy</a>
+                <a href="{{ route('dashboard', ['period' => 'week']) }}"
+                   class="btn btn-sm {{ $period === 'week' ? 'btn-primary' : 'btn-outline-primary' }}">Semana</a>
+                <a href="{{ route('dashboard', ['period' => 'month']) }}"
+                   class="btn btn-sm {{ $period === 'month' ? 'btn-primary' : 'btn-outline-primary' }}">Mes</a>
+                <a href="{{ route('dashboard', ['period' => 'year']) }}"
+                   class="btn btn-sm {{ $period === 'year' ? 'btn-primary' : 'btn-outline-primary' }}">Año</a>
+            </div>
         </div>
-
     </div>
 
     {{-- Periodo seleccionado --}}
@@ -300,7 +457,7 @@
                     <div class="d-flex align-items-center justify-content-between">
 
                         <div class="dashboard-number">
-                            {{ number_format($diabetesPatients) }}
+                            {{ number_format($diabetesOnlyPatients + $bothComorbiditiesPatients) }}
                         </div>
 
                         <i class="bi bi-heart-pulse fs-2 text-danger"></i>
@@ -328,7 +485,7 @@
                     <div class="d-flex align-items-center justify-content-between">
 
                         <div class="dashboard-number">
-                            {{ number_format($hypertensionPatients) }}
+                            {{ number_format($hypertensionOnlyPatients + $bothComorbiditiesPatients) }}
                         </div>
 
                         <i class="bi bi-heart-pulse fs-2 text-warning"></i>
@@ -372,6 +529,80 @@
 
         </div>
 
+    </div>
+
+    {{-- Distribución de comorbilidades de pacientes atendidos en el rango --}}
+    <div class="card dashboard-card mb-4" id="comorbidityReport">
+        <div class="card-body p-4">
+            <div class="print-report-heading">
+                <h1>Reporte de atención por comorbilidad</h1>
+                <p>Periodo: {{ $startDate->format('d/m/Y') }} al {{ $endDate->format('d/m/Y') }}</p>
+                <p>Generado el {{ now()->format('d/m/Y H:i') }}</p>
+            </div>
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-2 mb-3">
+                <div>
+                    <h5 class="fw-bold mb-1">Atención por comorbilidad</h5>
+                    <p class="text-muted small mb-0">
+                        Pacientes únicos atendidos del {{ $startDate->format('d/m/Y') }} al {{ $endDate->format('d/m/Y') }}
+                    </p>
+                </div>
+                <div class="d-flex align-items-start gap-2 no-print">
+                    <span class="badge text-bg-light border align-self-start">
+                        Total: {{ number_format($totalComorbidityPatients) }} pacientes
+                    </span>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="printComorbidityReport()">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Exportar PDF
+                    </button>
+                </div>
+            </div>
+
+            <div class="row align-items-center g-4">
+                <div class="col-12 col-lg-6">
+                    @if($totalComorbidityPatients > 0)
+                        <div class="pie-print-container" style="max-width: 430px; margin: 0 auto; position:relative; height:300px;">
+                            <canvas id="comorbidityPieChart" aria-label="Gráfica de pastel de comorbilidades" role="img"></canvas>
+                        </div>
+                    @else
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-pie-chart fs-1 d-block mb-3"></i>
+                            No se identificaron pacientes atendidos con estas comorbilidades en el rango.
+                        </div>
+                    @endif
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Diabetes exclusivamente</span>
+                            <strong>{{ number_format($diabetesOnlyPatients) }}</strong>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Hipertensión exclusivamente</span>
+                            <strong>{{ number_format($hypertensionOnlyPatients) }}</strong>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Ambas comorbilidades</span>
+                            <strong>{{ number_format($bothComorbiditiesPatients) }}</strong>
+                        </div>
+                    </div>
+                    <div class="alert alert-light border mt-3 mb-0">
+                        <div class="fw-semibold mb-1"><i class="bi bi-card-text me-1"></i> Análisis del periodo</div>
+                        <p class="mb-0 small" id="comorbidityAnalysisText">{{ $comorbidityAnalysis }}</p>
+                        <div class="text-muted small mt-2 no-print">Análisis descriptivo. La narración generada con IA se incorporará también al reporte impreso.</div>
+                        <div class="no-print mt-3">
+                            <form id="aiComorbidityAnalysisForm" action="{{ route('dashboard.comorbidity-analysis') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="start_date" value="{{ $startDate->format('Y-m-d') }}">
+                                <input type="hidden" name="end_date" value="{{ $endDate->format('Y-m-d') }}">
+                                <button type="submit" class="btn btn-primary btn-sm" id="generateAiAnalysisButton">
+                                    <i class="bi bi-stars me-1"></i> Generar análisis con IA
+                                </button>
+                                <span class="small text-muted ms-2" id="aiComorbidityAnalysisStatus" role="status" aria-live="polite"></span>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- Gráfica --}}
@@ -448,3 +679,107 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    function printComorbidityReport() {
+        window.print();
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('aiComorbidityAnalysisForm');
+        if (!form) return;
+
+        const button = document.getElementById('generateAiAnalysisButton');
+        const status = document.getElementById('aiComorbidityAnalysisStatus');
+        const analysisText = document.getElementById('comorbidityAnalysisText');
+        const originalButtonHtml = button.innerHTML;
+
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            button.disabled = true;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span> Generando…';
+            status.textContent = 'La IA está redactando el análisis. Puede tardar unos segundos.';
+            status.className = 'small text-muted ms-2';
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: new FormData(form),
+                    credentials: 'same-origin'
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Ocurrió un error al generar el análisis.');
+                }
+
+                analysisText.textContent = data.analysis;
+                status.textContent = 'Análisis generado con IA. Se incluirá al exportar el PDF.';
+                status.className = 'small text-success ms-2';
+            } catch (error) {
+                status.textContent = error.message || 'No fue posible generar el análisis.';
+                status.className = 'small text-danger ms-2';
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalButtonHtml;
+            }
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+@if($totalComorbidityPatients > 0)
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const canvas = document.getElementById('comorbidityPieChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        const comorbidityChart = new Chart(canvas, {
+            type: 'pie',
+            data: {
+                labels: ['Diabetes exclusivamente', 'Hipertensión exclusivamente', 'Ambas comorbilidades'],
+                datasets: [{
+                    data: [
+                        {{ $diabetesOnlyPatients }},
+                        {{ $hypertensionOnlyPatients }},
+                        {{ $bothComorbiditiesPatients }}
+                    ],
+                    backgroundColor: ['#dc3545', '#ffc107', '#0d6efd'],
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const total = context.dataset.data.reduce((sum, value) => sum + value, 0);
+                                const value = context.raw || 0;
+                                const percentage = total ? (value * 100 / total).toFixed(1) : '0.0';
+                                return `${context.label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chart.js requiere dimensiones explícitas al imprimir; se restauran al cerrar la impresión.
+        window.addEventListener('beforeprint', function () {
+            comorbidityChart.resize(460, 320);
+        });
+        window.addEventListener('afterprint', function () {
+            comorbidityChart.resize();
+        });
+    });
+</script>
+@endif
+@endpush
