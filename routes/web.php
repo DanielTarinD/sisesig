@@ -11,6 +11,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ComorbidityController;
 use App\Http\Controllers\ColoniaController;
 
+
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 
 Route::post('/login', [AuthController::class, 'login'])
@@ -29,8 +30,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/dashboard/comorbidity-analysis', [DashboardController::class, 'generateComorbidityAnalysis'])
         ->name('dashboard.comorbidity-analysis');
-    
-    
+
+
     /*
     |--------------------------------------------------------------------------
     | Pacientes - consultas
@@ -44,9 +45,9 @@ Route::middleware('auth')->group(function () {
     // Listado
     Route::get('/patients', [PatientController::class, 'index'])
         ->name('patients.index');
-    
+
     Route::get('/patients/check-duplicate', [PatientController::class, 'checkDuplicate'])
-    ->name('patients.checkDuplicate');
+        ->name('patients.checkDuplicate');
 
 
     /*
@@ -73,6 +74,12 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/patients/{patient}/follow-ups', [FollowUpController::class, 'store'])
             ->name('followups.store');
+
+        Route::get('/follow-ups/{followUp}/edit', [FollowUpController::class, 'edit'])
+            ->name('followups.edit');
+
+        Route::put('/follow-ups/{followUp}', [FollowUpController::class, 'update'])
+            ->name('followups.update');
 
         Route::delete('/follow-ups/{followUp}', [FollowUpController::class, 'destroy'])
             ->name('followups.destroy');
