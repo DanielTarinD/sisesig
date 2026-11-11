@@ -543,12 +543,15 @@
                 <div>
                     <h5 class="fw-bold mb-1">Atención por comorbilidad</h5>
                     <p class="text-muted small mb-0">
-                        Pacientes únicos atendidos del {{ $startDate->format('d/m/Y') }} al {{ $endDate->format('d/m/Y') }}
+                        Porcentajes respecto al total de usuarios atendidos del {{ $startDate->format('d/m/Y') }} al {{ $endDate->format('d/m/Y') }}
+                    </p>
+                    <p class="text-muted small mb-0">
+                        Diabetes e hipertensión incluyen a usuarios que presentan ambas condiciones; por ello, sus porcentajes pueden superponerse.
                     </p>
                 </div>
                 <div class="d-flex align-items-start gap-2 no-print">
                     <span class="badge text-bg-light border align-self-start">
-                        Total: {{ number_format($totalComorbidityPatients) }} pacientes
+                        Total: {{ number_format($totalAttendedPatients) }} usuarios atendidos
                     </span>
                     <button type="button" class="btn btn-outline-secondary btn-sm" onclick="printComorbidityReport()">
                         <i class="bi bi-file-earmark-pdf me-1"></i> Exportar PDF
@@ -558,30 +561,38 @@
 
             <div class="row align-items-center g-4">
                 <div class="col-12 col-lg-6">
-                    @if($totalComorbidityPatients > 0)
+                    @if($totalAttendedPatients > 0)
                         <div class="pie-print-container" style="max-width: 430px; margin: 0 auto; position:relative; height:300px;">
-                            <canvas id="comorbidityPieChart" aria-label="Gráfica de pastel de comorbilidades" role="img"></canvas>
+                            <canvas id="comorbidityPieChart" aria-label="Gráfica de pastel con porcentajes de distribución de usuarios atendidos" role="img"></canvas>
                         </div>
                     @else
                         <div class="text-center text-muted py-5">
                             <i class="bi bi-pie-chart fs-1 d-block mb-3"></i>
-                            No se identificaron pacientes atendidos con estas comorbilidades en el rango.
+                            No se registraron usuarios atendidos en el rango seleccionado.
                         </div>
                     @endif
                 </div>
                 <div class="col-12 col-lg-6">
                     <div class="list-group list-group-flush">
                         <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>Diabetes exclusivamente</span>
-                            <strong>{{ number_format($diabetesOnlyPatients) }}</strong>
+                            <span><strong>Total de usuarios atendidos</strong></span>
+                            <strong>{{ number_format($totalAttendedPatients) }} (100%)</strong>
                         </div>
                         <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                            <span>Hipertensión exclusivamente</span>
-                            <strong>{{ number_format($hypertensionOnlyPatients) }}</strong>
+                            <span>Diabetes (incluye ambas)</span>
+                            <strong>{{ number_format($diabetesOnlyPatients + $bothComorbiditiesPatients) }} ({{ number_format(($totalAttendedPatients > 0 ? ($diabetesOnlyPatients + $bothComorbiditiesPatients) * 100 / $totalAttendedPatients : 0), 2) }}%)</strong>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Hipertensión (incluye ambas)</span>
+                            <strong>{{ number_format($hypertensionOnlyPatients + $bothComorbiditiesPatients) }} ({{ number_format(($totalAttendedPatients > 0 ? ($hypertensionOnlyPatients + $bothComorbiditiesPatients) * 100 / $totalAttendedPatients : 0), 2) }}%)</strong>
                         </div>
                         <div class="list-group-item d-flex justify-content-between align-items-center px-0">
                             <span>Ambas comorbilidades</span>
-                            <strong>{{ number_format($bothComorbiditiesPatients) }}</strong>
+                            <strong>{{ number_format($bothComorbiditiesPatients) }} ({{ number_format($overallPercentages['both'], 2) }}%)</strong>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Sin antecedentes registrados de DM/HAS</span>
+                            <strong>{{ number_format($noChronicHistoryPatients) }} ({{ number_format($overallPercentages['no_history'], 2) }}%)</strong>
                         </div>
                     </div>
                     <div class="alert alert-light border mt-3 mb-0">
@@ -732,7 +743,7 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-@if($totalComorbidityPatients > 0)
+@if($totalAttendedPatients > 0)
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const canvas = document.getElementById('comorbidityPieChart');
@@ -741,30 +752,72 @@
         const comorbidityChart = new Chart(canvas, {
             type: 'pie',
             data: {
-                labels: ['Diabetes exclusivamente', 'Hipertensión exclusivamente', 'Ambas comorbilidades'],
+                labels: ['Sin antecedentes registrados', 'Diabetes', 'Hipertensión', 'Ambas'],
                 datasets: [{
                     data: [
+                        {{ $noChronicHistoryPatients }},
                         {{ $diabetesOnlyPatients }},
                         {{ $hypertensionOnlyPatients }},
                         {{ $bothComorbiditiesPatients }}
                     ],
-                    backgroundColor: ['#dc3545', '#ffc107', '#0d6efd'],
+                    backgroundColor: ['#b7d9c8', '#f2b8b5', '#f5df9b', '#b9c9ef'],
                     borderColor: '#ffffff',
                     borderWidth: 2
                 }]
             },
+            plugins: [{
+                id: 'percentageLabels',
+                afterDatasetsDraw: function (chart) {
+                    const ctx = chart.ctx;
+                    const dataset = chart.data.datasets[0];
+                    const total = {{ $totalAttendedPatients }};
+                    chart.getDatasetMeta(0).data.forEach(function (arc, index) {
+                        const value = dataset.data[index] || 0;
+                        const percentage = total > 0 ? value * 100 / total : 0;
+                        if (percentage < 2.5 || value === 0) return;
+                        const point = arc.tooltipPosition();
+                        ctx.save();
+                        ctx.fillStyle = '#344054';
+                        ctx.font = 'bold 12px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(percentage.toFixed(2) + '%', point.x, point.y);
+                        ctx.restore();
+                    });
+                }
+            }],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { position: 'bottom' },
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            generateLabels: function (chart) {
+                                const dataset = chart.data.datasets[0];
+                                const total = {{ $totalAttendedPatients }};
+                                return chart.data.labels.map(function (label, index) {
+                                    const value = dataset.data[index] || 0;
+                                    const percentage = total > 0 ? (value * 100 / total).toFixed(2) : '0.00';
+                                    return {
+                                        text: `${label}: ${value} (${percentage}%)`,
+                                        fillStyle: dataset.backgroundColor[index],
+                                        strokeStyle: dataset.borderColor,
+                                        lineWidth: dataset.borderWidth,
+                                        hidden: !chart.getDataVisibility(index),
+                                        index: index
+                                    };
+                                });
+                            }
+                        }
+                    },
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                const total = context.dataset.data.reduce((sum, value) => sum + value, 0);
+                                const total = {{ $totalAttendedPatients }};
                                 const value = context.raw || 0;
-                                const percentage = total ? (value * 100 / total).toFixed(1) : '0.0';
-                                return `${context.label}: ${value} (${percentage}%)`;
+                                const percentage = total ? (value * 100 / total).toFixed(2) : '0.00';
+                                return `${context.label}: ${value} usuarios (${percentage}% del total atendido)`;
                             }
                         }
                     }

@@ -86,17 +86,59 @@ class DashboardController extends Controller
 
         $totalComorbidityPatients = $diabetesOnlyPatients + $hypertensionOnlyPatients + $bothComorbiditiesPatients;
 
-        // Redacción descriptiva basada en reglas, no utiliza API ni transmite información.
-        if ($totalComorbidityPatients === 0) {
-            $comorbidityAnalysis = 'En el periodo seleccionado no se identificaron pacientes atendidos con diabetes, hipertensión o ambas comorbilidades.';
+        // Universo: pacientes únicos con al menos una atención en el rango seleccionado.
+        // Los porcentajes se calculan sobre este total, incluyendo usuarios sin antecedentes.
+        $totalAttendedPatients = (clone $attendedPatientsQuery)->count();
+        $noChronicHistoryPatients = max(
+            $totalAttendedPatients - $totalComorbidityPatients,
+            0
+        );
+
+        $overallPercentages = [
+            'no_history' => $totalAttendedPatients > 0
+                ? round($noChronicHistoryPatients * 100 / $totalAttendedPatients, 2)
+                : 0,
+            'diabetes' => $totalAttendedPatients > 0
+                ? round($diabetesOnlyPatients * 100 / $totalAttendedPatients, 2)
+                : 0,
+            'hypertension' => $totalAttendedPatients > 0
+                ? round($hypertensionOnlyPatients * 100 / $totalAttendedPatients, 2)
+                : 0,
+            'both' => $totalAttendedPatients > 0
+                ? round($bothComorbiditiesPatients * 100 / $totalAttendedPatients, 2)
+                : 0,
+        ];
+
+        // Análisis descriptivo con reglas fijas, con el total de usuarios atendidos como denominador.
+        if ($totalAttendedPatients === 0) {
+            $comorbidityAnalysis = "En el periodo del {$startDate->format('d/m/Y')} al {$endDate->format('d/m/Y')}, no se registraron usuarios atendidos.";
         } else {
-            $dmPercentage = round(($diabetesOnlyPatients / $totalComorbidityPatients) * 100, 1);
-            $hasPercentage = round(($hypertensionOnlyPatients / $totalComorbidityPatients) * 100, 1);
-            $bothPercentage = round(($bothComorbiditiesPatients / $totalComorbidityPatients) * 100, 1);
+            $noHistoryPct = number_format($overallPercentages['no_history'], 2);
+            $dmPct = number_format($overallPercentages['diabetes'], 2);
+            $hasPct = number_format($overallPercentages['hypertension'], 2);
+            $bothPct = number_format($overallPercentages['both'], 2);
 
-            $comorbidityAnalysis = "En el periodo del {$startDate->format('d/m/Y')} al {$endDate->format('d/m/Y')}, se registraron {$totalComorbidityPatients} pacientes únicos atendidos con las comorbilidades analizadas. {$diabetesOnlyPatients} ({$dmPercentage} %) presentaron diabetes exclusivamente, {$hypertensionOnlyPatients} ({$hasPercentage} %) hipertensión exclusivamente y {$bothComorbiditiesPatients} ({$bothPercentage} %) ambas condiciones. Estas cifras describen la distribución de pacientes atendidos en el periodo seleccionado.";
+            $comorbidityAnalysis = "Se brindó atención a un total de {$totalAttendedPatients} usuarios, del {$startDate->format('d/m/Y')} al {$endDate->format('d/m/Y')}, de los cuales {$noChronicHistoryPatients} ({$noHistoryPct}%) no presentan antecedentes registrados de enfermedades crónico-degenerativas, {$hypertensionOnlyPatients} ({$hasPct}%) presentan hipertensión arterial exclusivamente, {$diabetesOnlyPatients} ({$dmPct}%) presentan diabetes mellitus exclusivamente y {$bothComorbiditiesPatients} ({$bothPct}%) presentan ambas condiciones.";
+
+            $chronicCategories = [
+                'hipertensión arterial' => $hypertensionOnlyPatients,
+                'diabetes mellitus' => $diabetesOnlyPatients,
+                'ambas enfermedades' => $bothComorbiditiesPatients,
+            ];
+            arsort($chronicCategories);
+            $mostFrequentChronic = array_key_first($chronicCategories);
+            $mostFrequentChronicCount = reset($chronicCategories);
+
+            if ($overallPercentages['no_history'] > 50) {
+                $observation = "En el periodo analizado, la mayoría de los usuarios no cuenta con antecedentes registrados de estas enfermedades; entre quienes sí presentan alguna condición, {$mostFrequentChronic} es la categoría más frecuente ({$mostFrequentChronicCount} usuarios).";
+            } elseif ($noChronicHistoryPatients >= max($diabetesOnlyPatients, $hypertensionOnlyPatients, $bothComorbiditiesPatients)) {
+                $observation = "En el periodo analizado, el grupo más numeroso corresponde a usuarios sin antecedentes registrados; entre las condiciones crónicas, {$mostFrequentChronic} es la más frecuente ({$mostFrequentChronicCount} usuarios).";
+            } else {
+                $observation = "Entre las categorías de enfermedades crónico-degenerativas, {$mostFrequentChronic} es la más frecuente ({$mostFrequentChronicCount} usuarios).";
+            }
+
+            $comorbidityAnalysis .= " {$observation} Por tal motivo, es importante continuar promoviendo la prevención, la detección oportuna y el seguimiento mediante la toma periódica de signos vitales, orientación sobre alimentación saludable y promoción de hábitos que favorezcan una mejor calidad de vida.";
         }
-
         // Atenciones por día
         $followUpsByDay = FollowUp::select(DB::raw('DATE(date) as day'), DB::raw('COUNT(*) as total'))
             ->whereBetween(DB::raw('DATE(date)'), [$startDateString, $endDateString])
@@ -119,7 +161,7 @@ class DashboardController extends Controller
             'period', 'periodLabel', 'startDate', 'endDate', 'totalPatients',
             'totalFollowUps', 'todayFollowUps', 'periodFollowUps', 'newPatients',
             'diabetesOnlyPatients', 'hypertensionOnlyPatients', 'bothComorbiditiesPatients',
-            'totalComorbidityPatients', 'comorbidityAnalysis', 'averageFollowUps', 'followUpsByDay'
+            'totalComorbidityPatients', 'totalAttendedPatients', 'noChronicHistoryPatients', 'overallPercentages', 'comorbidityAnalysis', 'averageFollowUps', 'followUpsByDay'
         ));
     }
 
@@ -174,20 +216,26 @@ class DashboardController extends Controller
             ->whereHas('comorbidities', $hasHypertension)
             ->count();
 
-        $total = $diabetesOnly + $hypertensionOnly + $both;
+        // Denominador de IA: todos los pacientes únicos atendidos en el periodo.
+        $totalAttended = (clone $attendedPatientsQuery)->count();
+        $totalWithChronicHistory = $diabetesOnly + $hypertensionOnly + $both;
+        $noChronicHistory = max($totalAttended - $totalWithChronicHistory, 0);
+
         $percentages = [
-            'diabetes' => $total > 0 ? round($diabetesOnly * 100 / $total, 1) : 0,
-            'hypertension' => $total > 0 ? round($hypertensionOnly * 100 / $total, 1) : 0,
-            'both' => $total > 0 ? round($both * 100 / $total, 1) : 0,
+            'no_history' => $totalAttended > 0 ? round($noChronicHistory * 100 / $totalAttended, 2) : 0,
+            'diabetes' => $totalAttended > 0 ? round($diabetesOnly * 100 / $totalAttended, 2) : 0,
+            'hypertension' => $totalAttended > 0 ? round($hypertensionOnly * 100 / $totalAttended, 2) : 0,
+            'both' => $totalAttended > 0 ? round($both * 100 / $totalAttended, 2) : 0,
         ];
 
-        // Datos agregados que se envían a la IA; nunca se incluyen datos identificables.
+        // Se envían únicamente datos estadísticos agregados, sin información identificable.
         $input = json_encode([
             'periodo' => $startDate->format('d/m/Y') . ' al ' . $endDate->format('d/m/Y'),
-            'total' => $total,
-            'DM_exclusiva' => ['n' => $diabetesOnly, 'pct' => $percentages['diabetes']],
-            'HAS_exclusiva' => ['n' => $hypertensionOnly, 'pct' => $percentages['hypertension']],
-            'DM_HAS' => ['n' => $both, 'pct' => $percentages['both']],
+            'total_usuarios_atendidos' => $totalAttended,
+            'sin_antecedentes_DM_HAS' => ['n' => $noChronicHistory, 'pct' => $percentages['no_history']],
+            'diabetes_exclusiva' => ['n' => $diabetesOnly, 'pct' => $percentages['diabetes']],
+            'hipertension_exclusiva' => ['n' => $hypertensionOnly, 'pct' => $percentages['hypertension']],
+            'ambas' => ['n' => $both, 'pct' => $percentages['both']],
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         try {
@@ -197,16 +245,13 @@ class DashboardController extends Controller
                 ->post('https://api.openai.com/v1/responses', [
                     'model' => config('openai.model', 'gpt-6-luna'),
                     'instructions' => <<<'PROMPT'
-Analiza estos datos agregados de pacientes en salud pública. Responde en español institucional, conciso y sin repetir cifras innecesariamente. Usa solo los datos recibidos; no infieras prevalencia poblacional, tendencias, causas ni control clínico. No recomiendes tratamientos.
+Redacta en español un análisis institucional de salud pública siguiendo este estilo: descripción del total de usuarios y porcentajes, observación de la distribución y recomendación general de prevención, detección y seguimiento.
 
-Máximo 120 palabras. Formato:
-ANÁLISIS GENERAL: periodo, total y categoría mayoritaria.
-HALLAZGOS: 2 viñetas breves con cantidades y porcentajes.
-INTERPRETACIÓN: 1 oración cautelosa.
-RECOMENDACIONES: 3 acciones operativas breves y pertinentes.
-CONCLUSIÓN: 1 oración.
+Usa SIEMPRE como denominador el total de usuarios atendidos del periodo. Menciona cantidades y porcentajes de: usuarios sin antecedentes registrados, diabetes exclusiva, hipertensión exclusiva y ambas. Describe cuál categoría crónica es más frecuente; solo afirma que hay mayoría sin antecedentes si ese porcentaje supera 50%.
 
-Si total=0, informa que no hay pacientes contabilizados y omite recomendaciones. Devuelve únicamente estos apartados.
+Recomienda continuar con prevención, detección oportuna y seguimiento mediante toma periódica de signos vitales, orientación sobre alimentación saludable y promoción de hábitos saludables. No recomiendes tratamientos ni infieras prevalencia poblacional, causalidad, tendencias o control clínico. Usa solo los datos proporcionados.
+
+Máximo 110 palabras, en 2 párrafos, sin encabezados ni viñetas. Si total_usuarios_atendidos=0, indica únicamente que no hubo usuarios atendidos en el periodo.
 PROMPT,
                     'input' => $input,
                     'max_output_tokens' => 300,
